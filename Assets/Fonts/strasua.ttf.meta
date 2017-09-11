@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 557ec256938174345a5ca9d7ec40fb2b
+timeCreated: 1491071412
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Strasua
+  fontNames:
+  - Strasua
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
