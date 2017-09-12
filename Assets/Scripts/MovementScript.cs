@@ -25,7 +25,7 @@ public class MovementScript : MonoBehaviour {
 		}
 
 		if (!sharkCaptured) {
-			print ("surfacing: shark not captured; Time: " + Time.deltaTime + "local position: " + swimmer.transform.localPosition);
+//			print ("surfacing: shark not captured; Time: " + Time.deltaTime + "local position: " + swimmer.transform.localPosition);
 			transform.RotateAround (swimmer.transform.localPosition, Vector3.up, 40 * Time.deltaTime);
 		}
 

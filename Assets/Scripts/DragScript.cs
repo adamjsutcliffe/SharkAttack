@@ -12,16 +12,27 @@ public class DragScript : MonoBehaviour {
 	float originalY = 0; 
 	Rect beachRect;
 
+	private bool hasHitWater;
+
 	void Start()
 	{
 		float width = beachPlane.transform.localScale.z;
 		float height = beachPlane.transform.localScale.x;
 		beachRect = new Rect (beachPlane.transform.position.z - width/2f, beachPlane.transform.position.x - height/2f, width, height);
 		print ("Beach rect: " + beachRect);
+		hasHitWater = false;
+	}
+
+	void Update()
+	{
+		if (transform.position.y < 0 && !hasHitWater) {
+			print ("HIT WATER!!");
+			hasHitWater = true;
+			transform.parent.GetComponent<Manager> ().PlaySplash();
+		}
 	}
 
 	void OnTouchDown()
-//	void OnMouseDown() 
 	{
 		if (!isDraggable) { return; }
 		originalY = transform.position.y;
