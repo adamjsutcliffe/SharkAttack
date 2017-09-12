@@ -17,6 +17,7 @@ public class Manager : MonoBehaviour {
 	public GameObject swimmer;
 	public GameObject cage;
 	public Animator UIController;
+	public Animator SoundController;
 
 	public Text hintText;
 	public Text scoreText;
@@ -241,17 +242,34 @@ public class Manager : MonoBehaviour {
 		}
 	}
 
+	public void PlaySplash()
+	{
+		SoundController.SetTrigger ("PlaySplash");
+	}
+
+	public void PlayClap()
+	{
+		SoundController.SetTrigger ("PlayClap");
+	}
+
+	public void PlayGasp()
+	{
+		SoundController.SetTrigger ("PlayGasp");
+	}
+
 	public void CageCollided() {
 
 		print("Cage Collided :)");
 		usedCageCount += 1;
 		correctCages += 1;
+		PlayClap ();
 		checkAllCagesUsed();
 	}
 
 	public void CageMissed() {
 		print("Cage Missed :(");
 		usedCageCount += 1;
+		PlayGasp ();
 		checkAllCagesUsed();
 	}
 
@@ -322,4 +340,6 @@ public class Manager : MonoBehaviour {
 		ApplicationModel.isPaused = false;
 		resetGame ();
 	}
+
+
 }

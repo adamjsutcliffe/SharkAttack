@@ -19,7 +19,8 @@ public class CageCollision : MonoBehaviour {
 
 	public void OnTriggerEnter(Collider collider) {
 
-		if (collider.gameObject.CompareTag("Cage")) {
+		if (collider.gameObject.CompareTag("Cage")) 
+		{
 			
 			collider.gameObject.GetComponent<DragScript>().isDraggable = false;
 			collider.gameObject.GetComponentInParent<Manager>().CageCollided();
