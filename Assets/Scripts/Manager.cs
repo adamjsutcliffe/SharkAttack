@@ -18,6 +18,7 @@ public class Manager : MonoBehaviour {
 	public GameObject cage;
 	public Animator UIController;
 	public Animator SoundController;
+	private Animator GameAnimator;
 
 	public Text hintText;
 	public Text scoreText;
@@ -56,6 +57,7 @@ public class Manager : MonoBehaviour {
 		resumeButton.onClick.AddListener (resumeGame);
 		quitButton.onClick.AddListener (quitGame);
 		pauseButton.gameObject.SetActive(false);
+		GameAnimator = gameObject.GetComponent <Animator>();
 		GenerateGrid();
 	}
 
@@ -141,10 +143,12 @@ public class Manager : MonoBehaviour {
 		Invoke ("SpawnCage", 0.5f);
 		Invoke ("SpawnSwimmers", 2.0f);
 		pauseButton.gameObject.SetActive(true);
+		GameAnimator.SetTrigger ("StartDrama");
 	}
 
 	void endDonePressed()
 	{
+		GameAnimator.SetTrigger ("EndDrama");
 		UIController.SetTrigger("CloseEndMenu");
 		resetGame();
 	}
