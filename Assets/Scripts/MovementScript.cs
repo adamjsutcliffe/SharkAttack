@@ -2,24 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovementScript : MonoBehaviour {
+public class MovementScript : MonoBehaviour
+{
 
-	public enum playerState {swimming, diving, surfacing, stationary};
+	public enum playerState
+	{
+		swimming,
+		diving,
+		surfacing,
+		stationary
+	};
+
 	public playerState state = playerState.swimming;
 	public GameObject swimmer;
 	public bool sharkCaptured = false;
 
 	float totalDive;
 
-	void Start () {
+	void Start ()
+	{
 		totalDive = 0;
 		state = playerState.swimming;
 	}
 
-	void Update () {
+	void Update ()
+	{
 
-		if (ApplicationModel.isPaused)
-		{
+		if (ApplicationModel.isPaused) {
 			print ("game paused");
 			return;
 		}
@@ -27,11 +36,17 @@ public class MovementScript : MonoBehaviour {
 		if (!sharkCaptured) {
 //			print ("surfacing: shark not captured; Time: " + Time.deltaTime + "local position: " + swimmer.transform.localPosition);
 			transform.RotateAround (swimmer.transform.localPosition, Vector3.up, 40 * Time.deltaTime);
+
 		}
 
 		switch (state) {
 		case playerState.swimming:
 			{
+				if (transform.position.y < 0.7f)
+				{
+					var newPosition = new Vector3 (transform.position.x, transform.position.y + 0.12f, transform.position.z);
+					transform.position = newPosition;
+				}
 				break;
 			}
 		case playerState.diving:
@@ -65,22 +80,28 @@ public class MovementScript : MonoBehaviour {
 		}
 	}
 
-	public void Dive() {
+	public void Dive ()
+	{
 
-		if (state == playerState.diving) { return; }
+		if (state == playerState.diving) {
+			return;
+		}
 		state = playerState.diving;
 		print ("DIVE!!");
 	}
 
-	public void Surface() {
-		if (state == playerState.surfacing) { return; }
+	public void Surface ()
+	{
+		if (state == playerState.surfacing) {
+			return;
+		}
 		state = playerState.surfacing;
 		print ("SURFACE!!");
 	}
 
-//	public void ResetSwimmer() {
-//		//TODO: reset swimmer
-//		//reset all parameters in start method!
-//		print("NEED TO RESET SWIMMER!!");
-//	}
+	//	public void ResetSwimmer() {
+	//		//TODO: reset swimmer
+	//		//reset all parameters in start method!
+	//		print("NEED TO RESET SWIMMER!!");
+	//	}
 }
