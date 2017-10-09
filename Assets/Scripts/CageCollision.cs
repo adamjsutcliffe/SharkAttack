@@ -21,7 +21,8 @@ public class CageCollision : MonoBehaviour {
 
 		if (collider.gameObject.CompareTag("Cage")) 
 		{
-			
+			print ("Cage collided with shark!!");
+			sphereCollider.enabled = false;
 			collider.gameObject.GetComponent<DragScript>().isDraggable = false;
 			collider.gameObject.GetComponentInParent<Manager>().CageCollided();
 			collider.gameObject.transform.parent = null;
@@ -31,7 +32,7 @@ public class CageCollision : MonoBehaviour {
 			collider.gameObject.transform.localPosition = Vector3.zero;
 			collider.gameObject.transform.rotation = shark.transform.rotation;
 			collider.gameObject.transform.Rotate (new Vector3 (90, 0, 0));
-			collider.gameObject.transform.localPosition = new Vector3(-0.3f,0.3f,-1.7f);
+			collider.gameObject.transform.localPosition = new Vector3(-0.15f,0.3f,-1.25f);
 
 			GameObject cageDoor = collider.gameObject.transform.Find ("Cage_door").gameObject;
 			if (cageDoor != null) {
@@ -41,7 +42,6 @@ public class CageCollision : MonoBehaviour {
 //			//MAYBE: add new shark 'struggle' animation or speed up swim anim
 			shark.GetComponent<MovementScript> ().Surface();
 			shark.GetComponent<MovementScript> ().sharkCaptured = true;
-			sphereCollider.enabled = false;
 		}
 	}
 

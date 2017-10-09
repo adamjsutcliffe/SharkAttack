@@ -113,7 +113,7 @@ public class Manager : MonoBehaviour
 				s.GetComponentInChildren<MovementScript> ().Dive ();
 			}
 			int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer);
-			cageTimerText.text = "" + remainingTime;
+			cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
 		}
 		if (gameStarted) {
 			cageTimer += Time.deltaTime;
@@ -129,7 +129,7 @@ public class Manager : MonoBehaviour
 			} else if (!cagesActive) {
 				hintText.text = "Wait for the cages to unlock";
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
-				cageTimerText.text = "" + remainingTime;
+				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
 			}
 		}
 	}
@@ -142,7 +142,7 @@ public class Manager : MonoBehaviour
 	void startPressed ()
 	{
 		UIController.SetTrigger ("PlayGame");
-		diffCount = (int)diffSlider.value;
+		diffCount = 12;//(int)diffSlider.value;
 		swimmers = new GameObject[diffCount];
 		cages = new GameObject[diffCount];
 		resetGame ();
@@ -274,7 +274,6 @@ public class Manager : MonoBehaviour
 
 	public void CageCollided ()
 	{
-
 		print ("Cage Collided :)");
 		usedCageCount += 1;
 		correctCages += 1;
@@ -326,7 +325,7 @@ public class Manager : MonoBehaviour
 			scoreText.text = scoreTextStr;
 			PlayerPrefs.SetInt ("prev_score", newScore);
 			pauseButton.gameObject.SetActive (false);
-			Invoke ("showEndPanel", 2.0f);
+			Invoke ("showEndPanel", 4.0f);
 		}
 	}
 
@@ -356,6 +355,7 @@ public class Manager : MonoBehaviour
 
 	void quitGame ()
 	{
+		GameAnimator.SetTrigger ("EndDrama");
 		UIController.SetTrigger ("QuitGame");
 		ApplicationModel.isPaused = false;
 		resetGame ();
