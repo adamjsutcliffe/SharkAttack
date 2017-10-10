@@ -81,6 +81,7 @@ public class Manager : MonoBehaviour
 		cagesActive = false;
 		hintText.text = "";
 		cagesText.text = "";
+		cageTimerText.text = "";
 		//clear cages 
 		foreach (GameObject c in cages) {
 			Destroy (c);
@@ -121,7 +122,7 @@ public class Manager : MonoBehaviour
 				print ("unlock cages");
 				hintText.text = "Use the cages to capture the sharks";
 				cagesActive = true;
-				cageTimerText.text = "";
+				cageTimerText.text = "CAGES";
 				// set cage draggable active = true
 				foreach (GameObject c in cages) {
 					c.GetComponentInChildren<DragScript> ().isDraggable = true;
@@ -130,7 +131,10 @@ public class Manager : MonoBehaviour
 				hintText.text = "Wait for the cages to unlock";
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
 				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
-			}
+			} 
+//			else {
+//				cageTimerText.text = "CAGES";
+//			}
 		}
 	}
 
@@ -142,7 +146,7 @@ public class Manager : MonoBehaviour
 	void startPressed ()
 	{
 		UIController.SetTrigger ("PlayGame");
-		diffCount = 12;//(int)diffSlider.value;
+		diffCount = (int)diffSlider.value;
 		swimmers = new GameObject[diffCount];
 		cages = new GameObject[diffCount];
 		resetGame ();
@@ -181,7 +185,7 @@ public class Manager : MonoBehaviour
 
 	public void SpawnCage ()
 	{
-		print ("Spawn cage -> Total needed: " + diffCount + " total made: " + cageSpawnCount);
+//		print ("Spawn cage -> Total needed: " + diffCount + " total made: " + cageSpawnCount);
 		cagesText.text = "Cages left: " + (diffCount - cageSpawnCount);
 		if (cageSpawnCount >= diffCount) {
 			return;
@@ -192,27 +196,27 @@ public class Manager : MonoBehaviour
 		newCage.GetComponent<CageAppearance> ().SetColour (cageType - 1);
 		newCage.transform.parent = this.transform;
 		bool dragCheck = cageTimer > totalCageTime;
-		print ("Drag check: " + dragCheck);
+//		print ("Drag check: " + dragCheck);
 		
-		print ("show cage at position: " + cagePosition + "with type: " + cageType);
+//		print ("show cage at position: " + cagePosition + "with type: " + cageType);
 		cages [cageSpawnCount] = newCage;
 		newCage.GetComponent<DragScript> ().isDraggable = dragCheck;
-		print ("Cage is draggable: " + newCage.GetComponent<DragScript> ().isDraggable);
+//		print ("Cage is draggable: " + newCage.GetComponent<DragScript> ().isDraggable);
 		cageSpawnCount += 1;
 
 	}
 
 	void SpawnSwimmers ()
 	{
-		print ("Swimmers count 1: " + swimmers.Length);
+//		print ("Swimmers count 1: " + swimmers.Length);
 		Quaternion spawnRotation = Quaternion.identity;
 		for (int i = 0; i < diffCount; i++) {
 			Vector3 spawnPosition = spawnValues [i];
-			print ("swimmer position: " + spawnPosition);
+//			print ("swimmer position: " + spawnPosition);
 			GameObject newSwimmer = Instantiate (swimmer, spawnPosition, spawnRotation);
 			swimmers [i] = newSwimmer;
 		}
-		print ("Swimmers count 2: " + swimmers.Length);
+//		print ("Swimmers count 2: " + swimmers.Length);
 		swimmersSpawned = true;
 	}
 
@@ -240,7 +244,7 @@ public class Manager : MonoBehaviour
 				Vector3 spawnPosition = new Vector3 (xPosition, -2.25f, zPosition);
 				spawnValues [counter] = spawnPosition;
 				counter += 1;
-				print ("position: " + spawnPosition);
+//				print ("position: " + spawnPosition);
 			}
 		}
 		shuffle (spawnValues);
@@ -325,6 +329,8 @@ public class Manager : MonoBehaviour
 			scoreText.text = scoreTextStr;
 			PlayerPrefs.SetInt ("prev_score", newScore);
 			pauseButton.gameObject.SetActive (false);
+			cageTimerText.text = "";
+			cagesText.text = "";
 			Invoke ("showEndPanel", 4.0f);
 		}
 	}
