@@ -46,9 +46,6 @@ public class DragScript : MonoBehaviour {
 		Vector3 mousePosition = new Vector3 (Input.mousePosition.x, Input.mousePosition.y, distance);
 		Vector3 objPosition = Camera.main.ScreenToWorldPoint (mousePosition);
 		transform.position = objPosition;
-//		Vector2 point = new Vector2 (objPosition.z, objPosition.x);
-//		bool insideCheck = beachRect.Contains (point);
-//		print ("Drag position: " + point + " beach rect: " + beachRect + " inside: " + insideCheck);
 
 		Vector3 outlinePosition = new Vector3 (objPosition.x, 5, objPosition.z);
 		outline.transform.position = outlinePosition;

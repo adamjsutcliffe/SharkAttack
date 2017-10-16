@@ -7,6 +7,9 @@ using TMPro;
 public class Manager : MonoBehaviour
 {
 
+	[SerializeField]
+	private float swimmerShownDuration;
+
 	public Slider diffSlider;
 	public Slider timeSlider;
 	public Button startButton;
@@ -14,6 +17,7 @@ public class Manager : MonoBehaviour
 	public Button endDoneButton;
 	public Button pauseButton;
 	public Button resumeButton;
+	public Button replayButton;
 	public Button quitButton;
 	public GameObject swimmer;
 	public GameObject cage;
@@ -22,7 +26,7 @@ public class Manager : MonoBehaviour
 	private Animator GameAnimator;
 
 	public Text hintText;
-	public Text scoreText;
+	public TextMeshProUGUI scoreText;
 	public TextMeshProUGUI cagesText;
 	public TextMeshProUGUI cageTimerText;
 
@@ -54,12 +58,12 @@ public class Manager : MonoBehaviour
 	GameObject[] swimmers;
 	GameObject[] cages;
 
-	// Use this for initialization
 	void Start ()
 	{
 		startButton.onClick.AddListener (nextPressed);
 		timeButton.onClick.AddListener (startPressed);
 		endDoneButton.onClick.AddListener (endDonePressed);
+		replayButton.onClick.AddListener (replayPressed);
 		pauseButton.onClick.AddListener (pauseGame);
 		resumeButton.onClick.AddListener (resumeGame);
 		quitButton.onClick.AddListener (quitGame);
@@ -82,13 +86,18 @@ public class Manager : MonoBehaviour
 		hintText.text = "";
 		cagesText.text = "";
 		cageTimerText.text = "";
+		cageTimerText.gameObject.SetActive (true);
 		//clear cages 
-		foreach (GameObject c in cages) {
-			Destroy (c);
+		if (cages != null) {
+			foreach (GameObject c in cages) {
+				Destroy (c);
+			}
 		}
 		//clear swimmers 
-		foreach (GameObject s in swimmers) {
-			Destroy (s);
+		if (swimmers != null) {
+			foreach (GameObject s in swimmers) {
+				Destroy (s);
+			}
 		}
 	}
 
@@ -101,13 +110,13 @@ public class Manager : MonoBehaviour
 
 		if (swimmersSpawned) {
 			totalTime += Time.deltaTime;
-			if (totalTime < 5) {
+			if (totalTime < swimmerShownDuration) {
 				hintText.text = "Memorise the swimmers position";
 			}
 
 		}
 
-		if (totalTime > 5 && !gameStarted) {
+		if (totalTime > swimmerShownDuration && !gameStarted) {
 			print ("Make swimmers dive!!");
 			gameStarted = true;
 			foreach (GameObject s in swimmers) {
@@ -131,10 +140,7 @@ public class Manager : MonoBehaviour
 				hintText.text = "Wait for the cages to unlock";
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
 				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
-			} 
-//			else {
-//				cageTimerText.text = "CAGES";
-//			}
+			}
 		}
 	}
 
@@ -146,16 +152,27 @@ public class Manager : MonoBehaviour
 	void startPressed ()
 	{
 		UIController.SetTrigger ("PlayGame");
+		startGame ();
+	}
+
+	void startGame()
+	{
+		resetGame ();
 		diffCount = (int)diffSlider.value;
 		swimmers = new GameObject[diffCount];
 		cages = new GameObject[diffCount];
-		resetGame ();
 		setCageTime ();
 		print ("Diff: " + diffCount + " Time: " + cageType);
 		Invoke ("SpawnCage", 0.5f);
 		Invoke ("SpawnSwimmers", 2.0f);
 		pauseButton.gameObject.SetActive (true);
 		GameAnimator.SetTrigger ("StartDrama");
+	}
+
+	void replayPressed()
+	{
+		UIController.SetTrigger ("ReplayGame");
+		startGame ();
 	}
 
 	void endDonePressed ()
@@ -210,6 +227,7 @@ public class Manager : MonoBehaviour
 	{
 //		print ("Swimmers count 1: " + swimmers.Length);
 		Quaternion spawnRotation = Quaternion.identity;
+		shuffle (spawnValues);
 		for (int i = 0; i < diffCount; i++) {
 			Vector3 spawnPosition = spawnValues [i];
 //			print ("swimmer position: " + spawnPosition);
@@ -227,7 +245,7 @@ public class Manager : MonoBehaviour
 		float screenWidth = screenHeight * aspectRatio;
 		print ("Actual game view height: " + screenHeight + " width: " + screenWidth + " aspect ratio: " + aspectRatio);
 
-		float squareHeight = screenHeight * 0.9f / 4.0f;
+		float squareHeight = screenHeight * 0.86f / 4.0f;
 		float squareWidth = screenHeight * 0.9f / 3.0f;
 		print ("square: " + squareWidth + ":" + squareHeight);
 		cagePosition = new Vector3 (squareHeight * 0.9f + Camera.main.gameObject.transform.position.x * 0.5f, 6, squareWidth * 1.25f);
@@ -244,10 +262,8 @@ public class Manager : MonoBehaviour
 				Vector3 spawnPosition = new Vector3 (xPosition, -2.25f, zPosition);
 				spawnValues [counter] = spawnPosition;
 				counter += 1;
-//				print ("position: " + spawnPosition);
 			}
 		}
-		shuffle (spawnValues);
 	}
 
 	void shuffle<T> (T[] texts)
@@ -321,17 +337,18 @@ public class Manager : MonoBehaviour
 			}
 			string scoreTextStr = "<color=#00FF00FF>You scored: " + newScore + "</color>";
 			if (PlayerPrefs.HasKey ("prev_score")) {
-				scoreTextStr += "\nPrevious score: " + PlayerPrefs.GetInt ("prev_score");
+				scoreTextStr += "\n\nPrevious score: " + PlayerPrefs.GetInt ("prev_score");
 			}
 			if (PlayerPrefs.HasKey ("high_score")) {
-				scoreTextStr += "\nHighest score: " + PlayerPrefs.GetInt ("high_score");
+				scoreTextStr += "\n\nHighest score: " + PlayerPrefs.GetInt ("high_score");
 			}
 			scoreText.text = scoreTextStr;
 			PlayerPrefs.SetInt ("prev_score", newScore);
 			pauseButton.gameObject.SetActive (false);
-			cageTimerText.text = "";
+			cageTimerText.gameObject.SetActive (false);
 			cagesText.text = "";
-			Invoke ("showEndPanel", 4.0f);
+			hintText.text = "";
+			Invoke ("showEndPanel", 1.0f);
 		}
 	}
 

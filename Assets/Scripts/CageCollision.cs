@@ -6,16 +6,11 @@ public class CageCollision : MonoBehaviour {
 	
 	public GameObject shark;
 	public Collider sphereCollider;
-	// Use this for initialization
+
 	void Start () {
 		Vector3 rotation = new Vector3 (0, Random.Range (0, 360), 0);
 		transform.Rotate(rotation);
 	}
-	
-	// Update is called once per frame
-	// void Update () {
-		
-	// }
 
 	public void OnTriggerEnter(Collider collider) {
 
@@ -23,6 +18,7 @@ public class CageCollision : MonoBehaviour {
 		{
 			print ("Cage collided with shark!!");
 			sphereCollider.enabled = false;
+			collider.enabled = false;
 			collider.gameObject.GetComponent<DragScript>().isDraggable = false;
 			collider.gameObject.GetComponentInParent<Manager>().CageCollided();
 			collider.gameObject.transform.parent = null;
@@ -39,14 +35,9 @@ public class CageCollision : MonoBehaviour {
 				Vector3 doorRotation = new Vector3 (0, 32, 0);
 				cageDoor.transform.Rotate (doorRotation);
 			}
-//			//MAYBE: add new shark 'struggle' animation or speed up swim anim
+
 			shark.GetComponent<MovementScript> ().Surface();
 			shark.GetComponent<MovementScript> ().sharkCaptured = true;
 		}
-	}
-
-	public void resetCage() {
-		//TODO: reset cage
-		print("NEED TO RESET CAGE!!");
 	}
 }

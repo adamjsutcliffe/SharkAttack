@@ -98,10 +98,4 @@ public class MovementScript : MonoBehaviour
 		state = playerState.surfacing;
 		print ("SURFACE!!");
 	}
-
-	//	public void ResetSwimmer() {
-	//		//TODO: reset swimmer
-	//		//reset all parameters in start method!
-	//		print("NEED TO RESET SWIMMER!!");
-	//	}
 }
