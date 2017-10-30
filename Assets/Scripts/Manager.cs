@@ -21,6 +21,7 @@ public class Manager : MonoBehaviour
 	public Button quitButton;
 	public GameObject swimmer;
 	public GameObject cage;
+	public GameObject Beach;
 	public Animator UIController;
 	public Animator SoundController;
 	private Animator GameAnimator;
@@ -134,7 +135,7 @@ public class Manager : MonoBehaviour
 				cageTimerText.text = "CAGES";
 				// set cage draggable active = true
 				foreach (GameObject c in cages) {
-					c.GetComponentInChildren<DragScript> ().isDraggable = true;
+					c.GetComponent<DragScript> ().isDraggable = true;
 				}
 			} else if (!cagesActive) {
 				hintText.text = "Wait for the cages to unlock";
@@ -158,7 +159,7 @@ public class Manager : MonoBehaviour
 	void startGame()
 	{
 		resetGame ();
-		diffCount = (int)diffSlider.value;
+		diffCount = 12;//(int)diffSlider.value;
 		swimmers = new GameObject[diffCount];
 		cages = new GameObject[diffCount];
 		setCageTime ();
@@ -209,9 +210,12 @@ public class Manager : MonoBehaviour
 		}
 		
 		Quaternion spawnRotation = Quaternion.identity;
+		print ("Spawn cage: " + cagePosition);
 		GameObject newCage = Instantiate (cage, cagePosition, spawnRotation);
 		newCage.GetComponent<CageAppearance> ().SetColour (cageType - 1);
+		print ("Cage postion before: " + newCage.transform.position);
 		newCage.transform.parent = this.transform;
+		print ("Cage postion after: " + newCage.transform.position);
 		bool dragCheck = cageTimer > totalCageTime;
 //		print ("Drag check: " + dragCheck);
 		
@@ -240,15 +244,20 @@ public class Manager : MonoBehaviour
 
 	void GenerateGrid ()
 	{
-		float aspectRatio = (float)Camera.main.pixelWidth / (float)Camera.main.pixelHeight;
-		float screenHeight = Mathf.Tan (Camera.main.fieldOfView / 2 * Mathf.Deg2Rad) * Camera.main.transform.position.y * 2;
+		var camera = Camera.main;
+		float aspectRatio = (float)camera.pixelWidth / (float)camera.pixelHeight;
+		float screenHeight = Mathf.Tan (camera.fieldOfView / 2 * Mathf.Deg2Rad) * camera.transform.position.y * 2;
 		float screenWidth = screenHeight * aspectRatio;
 		print ("Actual game view height: " + screenHeight + " width: " + screenWidth + " aspect ratio: " + aspectRatio);
+		print ("Beach position: " + Beach.transform.position + " camera position: " + camera.transform.position);
 
 		float squareHeight = screenHeight * 0.86f / 4.0f;
 		float squareWidth = screenHeight * 0.9f / 3.0f;
 		print ("square: " + squareWidth + ":" + squareHeight);
-		cagePosition = new Vector3 (squareHeight * 0.9f + Camera.main.gameObject.transform.position.x * 0.5f, 6, squareWidth * 1.25f);
+
+		camera.gameObject.transform.position = new Vector3 (camera.gameObject.transform.position.x, camera.gameObject.transform.position.y, screenWidth/2);
+
+		cagePosition = new Vector3 (squareHeight * 0.9f + camera.gameObject.transform.position.x * 0.5f, 6f, squareHeight); //squareWidth * 1.2f);
 
 		int rows = 4;
 		int cols = 3;
@@ -257,8 +266,8 @@ public class Manager : MonoBehaviour
 		for (int row = 0; row < rows; row++) {
 			for (int col = 0; col < cols; col++) {
 
-				float xPosition = squareHeight * row + squareHeight * 0.5f + Camera.main.gameObject.transform.position.x * 0.5f + screenHeight * 0.07f;
-				float zPosition = squareWidth * col + squareWidth * 0.5f + Camera.main.gameObject.transform.position.z * 0.8f;
+				float xPosition = (squareHeight * row) + (squareHeight * 0.5f) + (camera.gameObject.transform.position.x * 0.5f) + (screenHeight * 0.07f);
+				float zPosition = (squareWidth * col) + (squareWidth * 0.5f) + (screenWidth/2 * 0.6f);
 				Vector3 spawnPosition = new Vector3 (xPosition, -2.25f, zPosition);
 				spawnValues [counter] = spawnPosition;
 				counter += 1;
