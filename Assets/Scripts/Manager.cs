@@ -7,12 +7,15 @@ using TMPro;
 public class Manager : MonoBehaviour
 {
 
-	[SerializeField]
+//	[SerializeField]
 	private float swimmerShownDuration;
+	private int scoreMultiplier;
 
 	public Slider diffSlider;
+	public Slider exposureSlider;
 	public Slider timeSlider;
 	public Button startButton;
+	public Button exposureButton;
 	public Button timeButton;
 	public Button endDoneButton;
 	public Button pauseButton;
@@ -62,6 +65,7 @@ public class Manager : MonoBehaviour
 	void Start ()
 	{
 		startButton.onClick.AddListener (nextPressed);
+		exposureButton.onClick.AddListener (expoureNextPressed);
 		timeButton.onClick.AddListener (startPressed);
 		endDoneButton.onClick.AddListener (endDonePressed);
 		replayButton.onClick.AddListener (replayPressed);
@@ -147,6 +151,11 @@ public class Manager : MonoBehaviour
 
 	void nextPressed ()
 	{
+		UIController.SetTrigger ("ShowExposureMenu");
+	}
+
+	void expoureNextPressed()
+	{
 		UIController.SetTrigger ("ShowCageMenu");
 	}
 
@@ -159,11 +168,12 @@ public class Manager : MonoBehaviour
 	void startGame()
 	{
 		resetGame ();
-		diffCount = 12;//(int)diffSlider.value;
+		diffCount = (int)diffSlider.value;
 		swimmers = new GameObject[diffCount];
 		cages = new GameObject[diffCount];
+		setExposureTime();
 		setCageTime ();
-		print ("Diff: " + diffCount + " Time: " + cageType);
+		print ("Diff: " + diffCount + " exposure time: " + swimmerShownDuration + " Cage Time: " + cageType);
 		Invoke ("SpawnCage", 0.5f);
 		Invoke ("SpawnSwimmers", 2.0f);
 		pauseButton.gameObject.SetActive (true);
@@ -199,6 +209,13 @@ public class Manager : MonoBehaviour
 			break;
 		}
 		print ("cageTime: " + totalCageTime);
+	}
+
+	void setExposureTime()
+	{
+		swimmerShownDuration = (int)exposureSlider.value == 1 ? 5f : 1f;
+		scoreMultiplier = (int)exposureSlider.value == 1 ? 1 : 2;
+		print ("Level Exposure time: " + swimmerShownDuration + " score mulitplier: " + scoreMultiplier);
 	}
 
 	public void SpawnCage ()
@@ -320,7 +337,19 @@ public class Manager : MonoBehaviour
 
 	int gameScore ()
 	{
-		return correctCages * 10 * cageType;
+		return correctCages * cageValueForType() * scoreMultiplier;
+	}
+
+	int cageValueForType()
+	{
+		switch (cageType) {
+		case 2:
+			return 25;
+		case 3:
+			return 50;
+		default:
+			return 10;
+		}
 	}
 
 	void surfaceMissedSwimmers ()
