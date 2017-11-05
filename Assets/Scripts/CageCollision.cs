@@ -22,8 +22,14 @@ public class CageCollision : MonoBehaviour {
 			collider.gameObject.GetComponent<DragScript>().isDraggable = false;
 			collider.gameObject.GetComponentInParent<Manager>().CageCollided();
 			collider.gameObject.transform.parent = null;
-			collider.gameObject.GetComponent<Rigidbody> ().useGravity = false;
-			collider.gameObject.GetComponent<Rigidbody> ().isKinematic = true;
+			collider.gameObject.GetComponent<CapsuleCollider>().enabled = false;
+			var meshColliders = collider.gameObject.GetComponentsInChildren <MeshCollider> ();
+			foreach (MeshCollider mesh in meshColliders) 
+			{
+				mesh.enabled = false;
+			}
+			Rigidbody cageBody = collider.gameObject.GetComponent<Rigidbody> ();
+			Destroy (cageBody);
 			collider.gameObject.transform.parent = shark.transform;
 			collider.gameObject.transform.localPosition = Vector3.zero;
 			collider.gameObject.transform.rotation = shark.transform.rotation;

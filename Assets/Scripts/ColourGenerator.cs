@@ -7,8 +7,7 @@ public class ColourGenerator : MonoBehaviour {
 	public GameObject suit;
 	public Material[] colours;
 
-	// Use this for initialization
-	void Start () {
+	void Awake () {
 
 		int randomColour = Random.Range(0, colours.Length);
 		print("load suit colour, size: " + colours.Length + " random: " + randomColour);
