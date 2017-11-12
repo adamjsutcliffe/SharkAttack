@@ -7,6 +7,7 @@ public class DragScript : MonoBehaviour {
 	public bool isDraggable;
 	public GameObject outline;
 	public GameObject Halo;
+    private Manager gameManager;
 
 	float distance = 70;
 	float originalY = 0; 
@@ -16,6 +17,8 @@ public class DragScript : MonoBehaviour {
 	void Start()
 	{
 		hasHitWater = false;
+        gameManager = transform.parent.GetComponent<Manager>();
+        print("Cage has manager: " + gameManager);
 	}
 
 	void Update()
@@ -23,7 +26,10 @@ public class DragScript : MonoBehaviour {
 		if (transform.position.y < 0 && !hasHitWater) {
 			print ("HIT WATER!!");
 			hasHitWater = true;
-			transform.parent.GetComponent<Manager> ().PlaySplash();
+            //if (gameManager != null)
+            //{
+                gameManager.PlaySplash();
+            //}
 		}
 	}
 
@@ -54,7 +60,7 @@ public class DragScript : MonoBehaviour {
 		if (PositionInsideBeach()) { return; }
 		outline.SetActive (false);
 		print("Parent: " + this.transform.parent);
-		transform.parent.GetComponent<Manager> ().SpawnCage ();
+        gameManager.SpawnCage ();
 	}
 		
 

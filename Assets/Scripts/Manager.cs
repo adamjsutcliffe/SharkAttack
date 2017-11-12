@@ -12,17 +12,11 @@ public class Manager : MonoBehaviour
 	public Slider diffSlider;
 	public Slider exposureSlider;
 	public Slider timeSlider;
-	public Button startButton;
-	public Button exposureButton;
-	public Button timeButton;
-	public Button endDoneButton;
 	public Button pauseButton;
-	public Button resumeButton;
-	public Button replayButton;
-	public Button quitButton;
 	public GameObject swimmer;
 	public GameObject cage;
 	public GameObject Beach;
+	public GameObject GlowSphere;
 	public Animator UIController;
 	public Animator SoundController;
 	private Animator GameAnimator;
@@ -30,6 +24,8 @@ public class Manager : MonoBehaviour
 	public Text hintText;
 	public TextMeshProUGUI scoreText;
 	public TextMeshProUGUI cageTimerText;
+
+	public Material[] colours;
 
 	Vector3[] spawnValues;
 	Vector3 cagePosition;
@@ -63,15 +59,8 @@ public class Manager : MonoBehaviour
 
 	void Start ()
 	{
-		startButton.onClick.AddListener (nextPressed);
-		exposureButton.onClick.AddListener (expoureNextPressed);
-		timeButton.onClick.AddListener (startPressed);
-		endDoneButton.onClick.AddListener (endDonePressed);
-		replayButton.onClick.AddListener (replayPressed);
-		pauseButton.onClick.AddListener (pauseGame);
-		resumeButton.onClick.AddListener (resumeGame);
-		quitButton.onClick.AddListener (quitGame);
 		pauseButton.gameObject.SetActive (false);
+		cageTimerText.gameObject.SetActive (false);
 		GameAnimator = gameObject.GetComponent <Animator> ();
 		GenerateGrid ();
 	}
@@ -116,54 +105,129 @@ public class Manager : MonoBehaviour
 			if (totalTime < swimmerShownDuration) {
 				hintText.text = "Memorise the swimmers position";
 			}
-
 		}
 
 		if (totalTime > swimmerShownDuration && !gameStarted) {
 			print ("Make swimmers dive!!");
 			gameStarted = true;
 			foreach (GameObject s in swimmers) {
-				s.GetComponentInChildren<MovementScript> ().Dive ();
+
+                MovementScript mS = s.GetComponentInChildren<MovementScript>();
+                if (mS != null)
+                {
+                    mS.Dive();
+                }
 			}
-			int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer);
-			cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
 		}
 		if (gameStarted) {
 			cageTimer += Time.deltaTime;
+
 			if (cageTimer > totalCageTime && !cagesActive) {
 				print ("unlock cages");
 				hintText.text = "Use the cages to capture the sharks";
 				cagesActive = true;
-
-				cageTimerText.text = diffCount + " " + cageColourText + " CAGES remaining";
-
+				GlowSphere.GetComponent<GlowScript> ().MakeGlowGreen ();
+				cageTimerText.gameObject.SetActive (true);
 				foreach (GameObject c in cages) {
-					print (c.name + " has a drag script? " + c.GetComponent<DragScript>());
+					print (c.name + " has a drag script? " + c.GetComponent<DragScript> ());
 					c.GetComponent<DragScript> ().isDraggable = true;
 				}
-			} else if (!cagesActive) {
+			} 
+			else if (!cagesActive) {
+				
+				cageTimerText.gameObject.SetActive (true);
 				hintText.text = "Wait for the cages to unlock";
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
 				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
+			} 
+			else 
+			{
+				int remainingCount = diffCount - cageSpawnCount + 1;
+				cageTimerText.text = remainingCount + "\n" + cageColourText + " CAGE" + (remainingCount > 1 ? "S" : "") + "\nremaining";
 			}
+				
 		}
 	}
 
-	void nextPressed ()
+
+	#region Button handling
+	public void PressSwimmerInfoNext()
+	{
+		UIController.SetTrigger ("ShowSwimmerSelection");
+	}
+
+	public void PressSwimmerSelectionNext()
 	{
 		UIController.SetTrigger ("ShowExposureMenu");
 	}
 
-	void expoureNextPressed()
+	public void PressExposureInfoNext()
+	{
+		UIController.SetTrigger ("ShowExposureSelection");
+	}
+
+	public void PressExposureSelectionNext()
 	{
 		UIController.SetTrigger ("ShowCageMenu");
 	}
 
-	void startPressed ()
+	public void PressCageInfoNext()
+	{
+		UIController.SetTrigger ("ShowCageSelection");
+	}
+
+	public void PressCageSelectionNext()
 	{
 		UIController.SetTrigger ("PlayGame");
 		startGame ();
 	}
+
+	public void PressedReplay()
+	{
+		UIController.SetTrigger ("ReplayGame");
+		startGame ();
+	}
+
+	public void PressedEndDone ()
+	{
+		GameAnimator.SetTrigger ("EndDrama");
+		UIController.SetTrigger ("CloseEndMenu");
+		resetGame ();
+	}
+
+	public void showEndPanel ()
+	{
+		UIController.SetTrigger ("EndGame");
+	}
+
+
+	public void PressPauseGame ()
+	{
+		ApplicationModel.isPaused = true;
+		pauseButton.gameObject.SetActive (false);
+		hintText.gameObject.SetActive (false);
+		cageTimerText.gameObject.SetActive (false);
+		UIController.SetTrigger ("ShowPauseMenu");
+	}
+
+	public void PressResumeGame ()
+	{
+		UIController.SetTrigger ("ResumeGame");
+		pauseButton.gameObject.SetActive (true);
+		hintText.gameObject.SetActive (true);
+		cageTimerText.gameObject.SetActive (true);
+		ApplicationModel.isPaused = false;
+	}
+
+	public void PressQuitGame ()
+	{
+		GameAnimator.SetTrigger ("EndDrama");
+		UIController.SetTrigger ("QuitGame");
+		ApplicationModel.isPaused = false;
+		resetGame ();
+	}
+
+	#endregion
 
 	void startGame()
 	{
@@ -177,22 +241,11 @@ public class Manager : MonoBehaviour
 		Invoke ("SpawnCage", 0.5f);
 		Invoke ("SpawnSwimmers", 2.0f);
 		pauseButton.gameObject.SetActive (true);
+		GlowSphere.GetComponent<GlowScript> ().MakeGlowRed ();
+		GlowSphere.SetActive (true);
 		GameAnimator.SetTrigger ("StartDrama");
 	}
-
-	void replayPressed()
-	{
-		UIController.SetTrigger ("ReplayGame");
-		startGame ();
-	}
-
-	void endDonePressed ()
-	{
-		GameAnimator.SetTrigger ("EndDrama");
-		UIController.SetTrigger ("CloseEndMenu");
-		resetGame ();
-	}
-
+		
 	void setCageTime ()
 	{
 		cageType = (int)timeSlider.value;
@@ -223,8 +276,9 @@ public class Manager : MonoBehaviour
 
 	public void SpawnCage ()
 	{
-		cageTimerText.text = (diffCount - cageSpawnCount) + " " + cageColourText + " CAGES remaining";
-		if (cageSpawnCount >= diffCount) {
+		cageSpawnCount += 1;
+		print ("[SPAWN CAGES] Cage spawn count: " + cageSpawnCount + " Diff count: " + diffCount);
+		if (cageSpawnCount > diffCount) {
 			return;
 		}
 		
@@ -239,18 +293,29 @@ public class Manager : MonoBehaviour
 		bool dragCheck = cageTimer > totalCageTime;
 		cages.Add(newCage);
 		newCage.GetComponent<DragScript> ().isDraggable = dragCheck;
-		cageSpawnCount += 1;
 
+		int remainingCount = diffCount - cageSpawnCount + 1;
+		cageTimerText.text = remainingCount + "\n" + cageColourText + " CAGE" + (remainingCount > 1 ? "S" : "") + "\nremaining";
 	}
 
 	void SpawnSwimmers ()
 	{
 		Quaternion spawnRotation = Quaternion.identity;
 		shuffle (spawnValues);
+		shuffle (colours);
 		for (int i = 0; i < diffCount; i++) {
+            Material color = colours[i];
 			Vector3 spawnPosition = spawnValues [i];
 			GameObject newSwimmer = Instantiate (swimmer, spawnPosition, spawnRotation);
+            newSwimmer.GetComponent<ColourGenerator>().SetSwimmerColour(color);
 			swimmers.Add (newSwimmer);
+
+            Vector3 decoyPosition = spawnValues[i + diffCount];
+            GameObject decoySwimmer = Instantiate(swimmer, decoyPosition, spawnRotation);
+            ColourGenerator cg = decoySwimmer.GetComponent<ColourGenerator>();
+            cg.SetSwimmerColour(color);
+            cg.RemoveShark();
+            swimmers.Add(decoySwimmer);
 		}
 		swimmersSpawned = true;
 	}
@@ -261,19 +326,16 @@ public class Manager : MonoBehaviour
 		float aspectRatio = (float)camera.pixelWidth / (float)camera.pixelHeight;
 		float screenHeight = Mathf.Tan (camera.fieldOfView / 2 * Mathf.Deg2Rad) * camera.transform.position.y * 2;
 		float screenWidth = screenHeight * aspectRatio;
-//		print ("Actual game view height: " + screenHeight + " width: " + screenWidth + " aspect ratio: " + aspectRatio);
-//		print ("Beach position: " + Beach.transform.position + " camera position: " + camera.transform.position);
-
-		float squareHeight = screenHeight * 0.86f / 4.0f;
-		float squareWidth = screenHeight * 0.9f / 3.0f;
-//		print ("square: " + squareWidth + ":" + squareHeight);
+		float squareHeight = screenHeight * 0.86f / 5.0f;
+		float squareWidth = screenHeight * 0.9f / 4.0f;
 
 		camera.gameObject.transform.position = new Vector3 (camera.gameObject.transform.position.x, camera.gameObject.transform.position.y, screenWidth/2);
 
-		cagePosition = new Vector3 (squareHeight * 0.8f + camera.gameObject.transform.position.x * 0.5f, 6f, squareHeight * 0.75f); //squareWidth * 1.2f);
+		cagePosition = new Vector3 (squareHeight * 1.8f + camera.gameObject.transform.position.x * 0.5f, 6f, squareHeight * 0.9f); //squareWidth * 1.2f);
+		GlowSphere.transform.position = cagePosition;
 
-		int rows = 4;
-		int cols = 3;
+		int rows = 5;
+		int cols = 4;
 		int counter = 0;
 		spawnValues = new Vector3[rows * cols];
 		for (int row = 0; row < rows; row++) {
@@ -319,7 +381,7 @@ public class Manager : MonoBehaviour
 		print ("Cage Collided :)");
 		usedCageCount += 1;
 		correctCages += 1;
-		PlayClap ();
+        Invoke("PlayClap", 0.5f);
 		checkAllCagesUsed ();
 	}
 
@@ -351,9 +413,14 @@ public class Manager : MonoBehaviour
 	void surfaceMissedSwimmers ()
 	{
 		foreach (GameObject s in swimmers) {
-			if (!s.GetComponentInChildren<MovementScript> ().sharkCaptured) {
-				s.GetComponentInChildren<MovementScript> ().Surface ();
-			}
+            MovementScript mS = s.GetComponentInChildren<MovementScript>();
+            if (mS != null && !mS.sharkCaptured)
+            {
+                mS.Surface();
+            }
+			//if (!s.GetComponentInChildren<MovementScript> ().sharkCaptured) {
+			//	s.GetComponentInChildren<MovementScript> ().Surface ();
+			//}
 		}
 	}
 
@@ -380,41 +447,12 @@ public class Manager : MonoBehaviour
 			PlayerPrefs.SetInt ("prev_score", newScore);
 			pauseButton.gameObject.SetActive (false);
 			cageTimerText.gameObject.SetActive (false);
+			GlowSphere.SetActive (false);
 			hintText.text = "";
 			Invoke ("showEndPanel", 1.0f);
 		}
 	}
 
-	void showEndPanel ()
-	{
-		UIController.SetTrigger ("EndGame");
-	}
 
-
-	void pauseGame ()
-	{
-		ApplicationModel.isPaused = true;
-		pauseButton.gameObject.SetActive (false);
-		hintText.gameObject.SetActive (false);
-		cageTimerText.gameObject.SetActive (false);
-		UIController.SetTrigger ("ShowPauseMenu");
-	}
-
-	void resumeGame ()
-	{
-		UIController.SetTrigger ("ResumeGame");
-		pauseButton.gameObject.SetActive (true);
-		hintText.gameObject.SetActive (true);
-		cageTimerText.gameObject.SetActive (true);
-		ApplicationModel.isPaused = false;
-	}
-
-	void quitGame ()
-	{
-		GameAnimator.SetTrigger ("EndDrama");
-		UIController.SetTrigger ("QuitGame");
-		ApplicationModel.isPaused = false;
-		resetGame ();
-	}
 		
 }
