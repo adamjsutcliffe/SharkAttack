@@ -37,7 +37,6 @@ public class DragScript : MonoBehaviour {
 	{
 		if (!isDraggable) { return; }
 		originalY = transform.position.y;
-		print ("OriginalY: " + originalY);
 		outline.SetActive (true);
 		Halo.SetActive (true);
 	}

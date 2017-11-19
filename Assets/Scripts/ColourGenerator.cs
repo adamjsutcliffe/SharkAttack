@@ -8,25 +8,19 @@ public class ColourGenerator : MonoBehaviour {
 	public GameObject shark;
 	public SphereCollider collider;
 
-	//public Material[] colours;
-
-	//void Awake () {
-
-	//	int randomColour = Random.Range(0, colours.Length);
-	//	print("load suit colour, size: " + colours.Length + " random: " + randomColour);
-	//	suit.GetComponent<SkinnedMeshRenderer> ().material = colours[randomColour];
-	//}
-
 	public void SetSwimmerColour(Material colour)
 	{
 		suit.GetComponent<SkinnedMeshRenderer> ().material = colour;
 	}
 
-	public void RemoveShark()
+	public void RemoveShark(bool removeCollider)
 	{
-        //TODO: destroy shark object and swimmers collider
-        print("remove shark and collider");
+        print("remove shark and collider ? " + removeCollider);
         Destroy(shark);
-        Destroy(collider);
+        if (removeCollider)
+        {
+            Destroy(collider);
+        }
+
 	}
 }

@@ -66,7 +66,7 @@ public class MovementScript : MonoBehaviour
 			{
 				totalDive -= 10 * Time.deltaTime;
 
-				if (totalDive > 0) {
+				if (totalDive > -2) {
 					
 //					Vector3 swimmerPosition = new Vector3 (swimmer.transform.position.x, -totalDive, swimmer.transform.position.z);
 //					swimmer.transform.position = swimmerPosition;

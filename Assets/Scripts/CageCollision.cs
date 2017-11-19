@@ -14,7 +14,7 @@ public class CageCollision : MonoBehaviour {
 
 	public void OnTriggerEnter(Collider collider) {
 
-		if (collider.gameObject.CompareTag("Cage")) 
+        if (collider.gameObject.CompareTag("Cage") && shark != null) 
 		{
 			print ("Cage collided with shark!!");
 			sphereCollider.enabled = false;
@@ -34,7 +34,7 @@ public class CageCollision : MonoBehaviour {
 			collider.gameObject.transform.localPosition = Vector3.zero;
 			collider.gameObject.transform.rotation = shark.transform.rotation;
 			collider.gameObject.transform.Rotate (new Vector3 (90, 0, 0));
-			collider.gameObject.transform.localPosition = new Vector3(-0.15f,0.3f,-1.25f);
+			collider.gameObject.transform.localPosition = new Vector3(-0.15f,0.3f,-1.1f);
 
 			GameObject cageDoor = collider.gameObject.transform.Find ("Cage_door").gameObject;
 			if (cageDoor != null) {

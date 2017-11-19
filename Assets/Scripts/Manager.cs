@@ -22,6 +22,7 @@ public class Manager : MonoBehaviour
 	private Animator GameAnimator;
 
 	public Text hintText;
+    public Image hintImage;
 	public TextMeshProUGUI scoreText;
 	public TextMeshProUGUI cageTimerText;
 
@@ -45,6 +46,8 @@ public class Manager : MonoBehaviour
 	bool swimmersSpawned = false;
 	bool gameStarted = false;
 	bool cagesActive = false;
+
+    private bool cageHintActive;
 
 	enum playerState
 	{
@@ -104,6 +107,7 @@ public class Manager : MonoBehaviour
 			totalTime += Time.deltaTime;
 			if (totalTime < swimmerShownDuration) {
 				hintText.text = "Memorise the swimmers position";
+                hintImage.gameObject.SetActive(false);
 			}
 		}
 
@@ -119,12 +123,14 @@ public class Manager : MonoBehaviour
                 }
 			}
 		}
+
 		if (gameStarted) {
 			cageTimer += Time.deltaTime;
 
 			if (cageTimer > totalCageTime && !cagesActive) {
 				print ("unlock cages");
-				hintText.text = "Use the cages to capture the sharks";
+				hintText.text = "Drag the cages      to capture the sharks";
+                hintImage.gameObject.SetActive(true);
 				cagesActive = true;
 				GlowSphere.GetComponent<GlowScript> ().MakeGlowGreen ();
 				cageTimerText.gameObject.SetActive (true);
@@ -137,6 +143,7 @@ public class Manager : MonoBehaviour
 				
 				cageTimerText.gameObject.SetActive (true);
 				hintText.text = "Wait for the cages to unlock";
+                hintImage.gameObject.SetActive(false);
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
 				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
 			} 
@@ -200,12 +207,18 @@ public class Manager : MonoBehaviour
 		UIController.SetTrigger ("EndGame");
 	}
 
+    public void BackSwimmerMenu()
+    {
+        UIController.SetTrigger("BackSwimmerMenu");
+    }
 
 	public void PressPauseGame ()
 	{
 		ApplicationModel.isPaused = true;
 		pauseButton.gameObject.SetActive (false);
 		hintText.gameObject.SetActive (false);
+        cageHintActive = hintImage.gameObject.activeSelf;
+        hintImage.gameObject.SetActive(false);
 		cageTimerText.gameObject.SetActive (false);
 		UIController.SetTrigger ("ShowPauseMenu");
 	}
@@ -215,6 +228,7 @@ public class Manager : MonoBehaviour
 		UIController.SetTrigger ("ResumeGame");
 		pauseButton.gameObject.SetActive (true);
 		hintText.gameObject.SetActive (true);
+        hintImage.gameObject.SetActive(cageHintActive);
 		cageTimerText.gameObject.SetActive (true);
 		ApplicationModel.isPaused = false;
 	}
@@ -222,7 +236,7 @@ public class Manager : MonoBehaviour
 	public void PressQuitGame ()
 	{
 		GameAnimator.SetTrigger ("EndDrama");
-		UIController.SetTrigger ("QuitGame");
+        UIController.SetTrigger ("QuitGame");
 		ApplicationModel.isPaused = false;
 		resetGame ();
 	}
@@ -256,7 +270,7 @@ public class Manager : MonoBehaviour
 			cageColourText = "<color=#C9B200FF>GOLD</color>";
 			break;
 		case 3:
-			totalCageTime = 10f;
+			totalCageTime = 15f;
 			cageColourText = "<color=#1E25B0FF>SAPPHIRE</color>";
 			break;
 		default:
@@ -269,7 +283,7 @@ public class Manager : MonoBehaviour
 
 	void setExposureTime()
 	{
-		swimmerShownDuration = (int)exposureSlider.value == 1 ? 5f : 1f;
+		swimmerShownDuration = (int)exposureSlider.value == 1 ? 11f : 4f;
 		scoreMultiplier = (int)exposureSlider.value == 1 ? 1 : 2;
 		print ("Level Exposure time: " + swimmerShownDuration + " score mulitplier: " + scoreMultiplier);
 	}
@@ -314,7 +328,7 @@ public class Manager : MonoBehaviour
             GameObject decoySwimmer = Instantiate(swimmer, decoyPosition, spawnRotation);
             ColourGenerator cg = decoySwimmer.GetComponent<ColourGenerator>();
             cg.SetSwimmerColour(color);
-            cg.RemoveShark();
+            cg.RemoveShark(false);
             swimmers.Add(decoySwimmer);
 		}
 		swimmersSpawned = true;
@@ -449,6 +463,7 @@ public class Manager : MonoBehaviour
 			cageTimerText.gameObject.SetActive (false);
 			GlowSphere.SetActive (false);
 			hintText.text = "";
+            hintImage.gameObject.SetActive(false);
 			Invoke ("showEndPanel", 1.0f);
 		}
 	}
