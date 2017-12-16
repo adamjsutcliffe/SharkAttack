@@ -8,6 +8,7 @@ public class CageAppearance : MonoBehaviour {
 	public GameObject cageBody;
 	public GameObject cageDoor;
 
+
 	public void SetColour(int value) 
 	{
 		print ("Set cage colour: " + value);
@@ -15,4 +16,5 @@ public class CageAppearance : MonoBehaviour {
 		cageDoor.GetComponent<MeshRenderer> ().material = colours[value];
 
 	}
+
 }

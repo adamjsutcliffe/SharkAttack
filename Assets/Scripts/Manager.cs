@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 using TMPro;
+using System;
 
 public class Manager : MonoBehaviour
 {
@@ -16,13 +18,14 @@ public class Manager : MonoBehaviour
 	public GameObject swimmer;
 	public GameObject cage;
 	public GameObject Beach;
+    public GameObject cageImage;
 	public GameObject GlowSphere;
 	public Animator UIController;
 	public Animator SoundController;
 	private Animator GameAnimator;
 
 	public Text hintText;
-    public Image hintImage;
+   // public Image cageImage;
 	public TextMeshProUGUI scoreText;
 	public TextMeshProUGUI cageTimerText;
 
@@ -49,6 +52,8 @@ public class Manager : MonoBehaviour
 
     private bool cageHintActive;
 
+
+
 	enum playerState
 	{
 		swimming,
@@ -66,9 +71,11 @@ public class Manager : MonoBehaviour
 		cageTimerText.gameObject.SetActive (false);
 		GameAnimator = gameObject.GetComponent <Animator> ();
 		GenerateGrid ();
+       
 	}
 
-	void resetGame ()
+
+    void resetGame ()
 	{
 		totalTime = 0f;
 		cageTimer = 0f;
@@ -107,7 +114,7 @@ public class Manager : MonoBehaviour
 			totalTime += Time.deltaTime;
 			if (totalTime < swimmerShownDuration) {
 				hintText.text = "Memorise the swimmers position";
-                hintImage.gameObject.SetActive(false);
+                cageImage.gameObject.SetActive(false);
 			}
 		}
 
@@ -130,8 +137,8 @@ public class Manager : MonoBehaviour
 			if (cageTimer > totalCageTime && !cagesActive) {
 				print ("unlock cages");
 				hintText.text = "Drag the cages      to capture the sharks";
-                hintImage.gameObject.SetActive(true);
-				cagesActive = true;
+                cageImage.gameObject.SetActive(true);
+                cagesActive = true;
 				GlowSphere.GetComponent<GlowScript> ().MakeGlowGreen ();
 				cageTimerText.gameObject.SetActive (true);
 				foreach (GameObject c in cages) {
@@ -143,7 +150,7 @@ public class Manager : MonoBehaviour
 				
 				cageTimerText.gameObject.SetActive (true);
 				hintText.text = "Wait for the cages to unlock";
-                hintImage.gameObject.SetActive(false);
+                cageImage.gameObject.SetActive(false);
 				int remainingTime = Mathf.FloorToInt (totalCageTime - cageTimer + 1);
 				cageTimerText.text = "Cages unlock in:\n" + remainingTime + " secs";
 			} 
@@ -153,7 +160,10 @@ public class Manager : MonoBehaviour
 				cageTimerText.text = remainingCount + "\n" + cageColourText + " CAGE" + (remainingCount > 1 ? "S" : "") + "\nremaining";
 			}
 				
-		}
+            
+        }
+
+       
 	}
 
 
@@ -217,8 +227,8 @@ public class Manager : MonoBehaviour
 		ApplicationModel.isPaused = true;
 		pauseButton.gameObject.SetActive (false);
 		hintText.gameObject.SetActive (false);
-        cageHintActive = hintImage.gameObject.activeSelf;
-        hintImage.gameObject.SetActive(false);
+        cageHintActive = cageImage.gameObject.activeSelf;
+        cageImage.gameObject.SetActive(false);
 		cageTimerText.gameObject.SetActive (false);
 		UIController.SetTrigger ("ShowPauseMenu");
 	}
@@ -228,7 +238,7 @@ public class Manager : MonoBehaviour
 		UIController.SetTrigger ("ResumeGame");
 		pauseButton.gameObject.SetActive (true);
 		hintText.gameObject.SetActive (true);
-        hintImage.gameObject.SetActive(cageHintActive);
+        cageImage.gameObject.SetActive(cageHintActive);
 		cageTimerText.gameObject.SetActive (true);
 		ApplicationModel.isPaused = false;
 	}
@@ -258,9 +268,12 @@ public class Manager : MonoBehaviour
 		GlowSphere.GetComponent<GlowScript> ().MakeGlowRed ();
 		GlowSphere.SetActive (true);
 		GameAnimator.SetTrigger ("StartDrama");
-	}
-		
-	void setCageTime ()
+    //    cage.gameObject.SetActive(true);
+    
+    }
+
+
+    void setCageTime ()
 	{
 		cageType = (int)timeSlider.value;
 
@@ -300,7 +313,8 @@ public class Manager : MonoBehaviour
 		print ("Spawn cage: " + cagePosition);
 		GameObject newCage = Instantiate (cage, cagePosition, spawnRotation);
 		newCage.GetComponent<CageAppearance> ().SetColour (cageType - 1);
-		newCage.name = "Cage" + cageSpawnCount;
+      //  newCage.GetComponent<Animation>().Play();
+        newCage.name = "Cage" + cageSpawnCount;
 		print ("Cage postion before: " + newCage.transform.position);
 		newCage.transform.parent = this.transform;
 		print ("Cage postion after: " + newCage.transform.position);
@@ -463,7 +477,7 @@ public class Manager : MonoBehaviour
 			cageTimerText.gameObject.SetActive (false);
 			GlowSphere.SetActive (false);
 			hintText.text = "";
-            hintImage.gameObject.SetActive(false);
+            cageImage.gameObject.SetActive(false);
 			Invoke ("showEndPanel", 1.0f);
 		}
 	}
